@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net"
+	"os"
 	"strings"
 
 	"github.com/miekg/dns"
@@ -26,6 +27,8 @@ func (this *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 				Hdr: dns.RR_Header{Name: domain, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: 60},
 				A:   address,
 			})
+
+			log.Printf("A response: %s => %s \n", domain, address.String())
 		}
 	}
 	w.WriteMsg(&msg)
@@ -68,6 +71,8 @@ func main() {
 
 	srv := &dns.Server{Addr: *listen, Net: "udp"}
 	srv.Handler = &handler{}
+
+	log.Printf("%s listening at %s...\n", os.Args[0], *listen)
 	if err := srv.ListenAndServe(); err != nil {
 		log.Fatalf("Failed to set udp listener %s\n", err.Error())
 	}
